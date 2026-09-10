@@ -667,6 +667,28 @@ duplication landed rather than after.
 
 ---
 
+### P-29 · Drop the co-author trailers
+
+*2026-09-10*
+
+> You probably don't need to keep mentioning that we are using claude, either. It's in every
+> single commit and seems really like a lot of noise at this point.
+
+**What I decided:** Reversing my earlier call. I chose full disclosure including commit
+trailers back in Phase 0, on the reasoning that the exercise is about AI-assisted development
+and hiding it would undercut the submission. That reasoning still holds — but the disclosure
+belongs in `docs/`, where it is substantive, not stapled to every commit where it is four
+repeated lines of noise per change.
+
+`docs/prompts.md` is twenty-nine entries of exactly how the assistant was used, and
+`docs/ai-evaluation.md` assesses it. A reviewer reading the git log learns nothing from the
+trailers that those do not tell them better.
+
+Trailers on commits already merged stay as they are. Rewriting history across four merged
+pull requests to tidy a footer would be a worse decision than the one I am correcting.
+
+---
+
 ## Decisions made through the question/answer tool
 
 Some of my choices were made by picking from options Claude laid out rather than by typing
@@ -675,5 +697,5 @@ a prompt. Recording them here so the log is complete.
 | Decision | Choice | Reasoning |
 | --- | --- | --- |
 | Handling known site defects | `test.fail()` defect probes | Self-maintaining defect log; goes red when the app is fixed; nothing is skipped |
-| Disclosing AI assistance | Full disclosure in docs and commit trailers | The exercise is explicitly about AI-assisted development, so hiding it would undercut the submission |
+| Disclosing AI assistance | Full disclosure in `docs/`; commit trailers dropped partway (see P-29) | The exercise is explicitly about AI-assisted development, so hiding it would undercut the submission — but the documentation is where that belongs |
 | API contract validation | Zod | One schema yields both the runtime check and the type, so they cannot drift |
