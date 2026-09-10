@@ -622,6 +622,51 @@ name is also a slightly better test input than a plain one.
 
 ---
 
+## Phase 6 — Defect probes
+
+### P-28 · Probe the broken accounts
+
+*2026-09-10*
+
+> ok, it's merged, Shirt Brother! Let's move on to the next piece, please!
+
+**What Claude produced:** Drove all four authenticating accounts through the same battery —
+images, names, prices, sorting, add, remove, checkout, finish — against `standard_user` as a
+control, then re-verified the two most surprising results before writing anything. Nine
+defects, each pinned by a `test.fail()` probe. Full writeup in [defects.md](./defects.md).
+
+Two findings I would not have predicted:
+
+**`visual_user` does not have visual defects.** I assumed layout and styling, which is what
+the name suggests. Its prices are simply *wrong*, and **regenerated on every page load** —
+three consecutive reads of the same six products returned three completely different price
+sets, while `standard_user` stayed stable. That also explains why sorting looks broken for
+this account: the values are re-randomised between the sort and the read, so no ordering could
+ever hold.
+
+**`problem_user`'s last name field is bound to the first name field.** Typing `LASTVALUE` into
+Last Name produced `first="LASTVALUE" last=""`. Checkout is impossible for this account.
+
+**What I decided:** Kept all nine, and pinned `problem_user` and `error_user`'s shared
+symptoms as separate probes rather than one parameterised pair. They look identical, but
+nothing guarantees they share a cause, and a fix for one would not close the other. Also kept
+`error_user`'s two probes for sorting and remove even though they duplicate `problem_user`'s,
+for the same reason.
+
+The one I would put in front of a reviewer is [DEFECT-08](./defects.md#defect-08).
+`error_user` gets *further* than the others — correct items, correct totals on the overview
+page — and then swallows the order at the final click, with no error shown. Every earlier step
+passes, so a smoke test that stops short of the last click reports the account as healthy.
+That is the argument for driving journeys to completion rather than asserting on intermediate
+pages.
+
+**On the framework side:** extracted `SHOPPER` to `src/data/shopper.ts` when the checkout
+details were about to be duplicated into a second spec, which is the same drift caught in P-19
+and P-26 — the third time in this project, and the first time it was caught before the
+duplication landed rather than after.
+
+---
+
 ## Decisions made through the question/answer tool
 
 Some of my choices were made by picking from options Claude laid out rather than by typing

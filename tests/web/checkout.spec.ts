@@ -2,11 +2,10 @@ import { expect } from '@playwright/test'
 import { test } from '@/fixtures/web'
 import { PRODUCTS, TAX_RATE } from '@/data/products'
 import { USERS } from '@/data/users'
+import { SHOPPER } from '@/data/shopper'
 import { storageStatePath } from '@/data/storage-state'
 
 test.use({ storageState: storageStatePath(USERS.standard) })
-
-const SHOPPER = { firstName: 'Bart-Harley', lastName: 'Jarvis', postalCode: '12345' }
 
 const BASKET = [PRODUCTS.fleeceJacket, PRODUCTS.onesie]
 
