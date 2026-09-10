@@ -17,3 +17,5 @@ export const ACCOUNTS_THAT_AUTHENTICATE: UserName[] = [
   USERS.error,
   USERS.visual,
 ]
+
+export const SESSION_ACCOUNTS: UserName[] = [USERS.standard, ...ACCOUNTS_THAT_AUTHENTICATE]

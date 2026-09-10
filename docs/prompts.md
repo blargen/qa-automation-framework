@@ -534,6 +534,94 @@ on the element you can actually click. Both caveats went into the page object sk
 
 ---
 
+## Phase 5 — Shopping journey
+
+### P-24 · Branch the shopping journey
+
+*2026-09-10*
+
+> I agree with the shopping journey. Let's call it "qas-be-shopping" for funsies. You should
+> be able to pull main and branch now, shirt brother!
+
+**What Claude produced:** Probed the whole flow before writing anything — catalogue, sort
+option values (`az`/`za`/`lohi`/`hilo`), cart, all three checkout pages, and the validation
+messages. Confirmed tax is exactly 8% of subtotal and total is subtotal plus tax, against two
+different baskets rather than one.
+
+Then, checking raw text rather than parsed numbers, it found a **real defect on
+`standard_user`**: the checkout subtotal renders as `Item total: $57.980000000000004`. Full
+writeup in [defects.md](./defects.md).
+
+**What I decided:** Kept the finding and pinned it with a `test.fail()` probe rather than
+filing it away in prose. Two things make it worth more than its cosmetic severity. It is not
+one of the bugs SauceDemo advertises — it is on the account that is supposed to work. And it
+is invisible to a numeric assertion: `57.980000000000004` passes `toBeCloseTo(57.98, 2)`
+without complaint, so only an assertion on the rendered string catches it. That is a lesson
+about assertion choice, not about SauceDemo.
+
+---
+
+### P-25 · Parameterise the saved sessions
+
+*2026-09-10*
+
+> but wouldn't it be easier to let them select a user and then use storageState to keep it
+> going? Or do you have an argument for actually just using standard user?
+
+**What Claude produced:** Conceded immediately — it had built the session setup for this
+branch instead of the next one. Rewrote it to save a session per account, keyed by user, with
+`storageStatePath(user)`.
+
+The measurement that settled it: `performance_glitch_user` takes **5.7 seconds** to log in by
+design. The `defect-probes` branch will run several tests against it. Logging in through the
+UI per test pays that latency every time; one saved session pays it once. Setup tests run in
+parallel, so all five sessions cost about one slow login of wall clock.
+
+**What I decided:** Mine, and I would make the same call again. The point was not that the
+parameterised version is more elegant — it is that the very next branch needs four other
+accounts, so building it for one user was work that would be thrown away within the hour.
+Adding an account is now a data change rather than a code change, which is what you want on
+a real application with roles.
+
+---
+
+### P-26 · Name things for what they do
+
+*2026-09-10*
+
+> but why is it called slug? I don't think that is a very good descriptive name for our
+> variable.
+
+**What Claude produced:** Renamed it to `productTestId`, and noticed while doing so that the
+function had been duplicated into both `InventoryPage` and `CartPage`. Extracted it to
+`src/pages/product-test-id.ts` so both import one copy.
+
+**What I decided:** Kept both changes. "Slug" is URL jargon borrowed from a different problem
+domain; what the function actually does is map a product's display name to the identifier
+SauceDemo embeds in its `data-test` attributes. The rename says that, the old name said
+nothing.
+
+Worth noting the duplication came along for free — the question was about a name and it
+surfaced a copy-paste. This is the second naming issue in this repository (see P-19), and both
+times the drift was invisible to the toolchain and only caught by reading.
+
+---
+
+### P-27 · A name for the shopper
+
+*2026-09-10*
+
+> but can you change the user to be "Bart-Harley Jarvis"?
+
+**What Claude produced:** Changed the checkout shopper, and wired the validation cases to read
+from the same `SHOPPER` constant instead of carrying their own copies of the name.
+
+**What I decided:** Took the constant refactor as well. Three literal copies of a name across
+one file is exactly how the `remove`/`deleted` drift in P-19 started. The hyphenated first
+name is also a slightly better test input than a plain one.
+
+---
+
 ## Decisions made through the question/answer tool
 
 Some of my choices were made by picking from options Claude laid out rather than by typing
