@@ -130,6 +130,22 @@ The body is typed `unknown` until a Zod schema narrows it. That is the only sanc
 to get a typed response, and it keeps the contract check visible in the test where it
 belongs.
 
+### Writes never persist
+
+JSONPlaceholder simulates every write: `POST` returns `201` with `id: collection size + 1`,
+`PUT` and `PATCH` return `200` with a convincing body, `DELETE` returns `200` and `{}`, and
+the server state never changes. Full verified behaviour is in `docs/api-behavior.md`.
+
+**Never write a test that creates a resource and then fetches it to confirm.** That test is
+wrong here in a dangerous way - it does not simply fail, it can pass for the wrong reason,
+because the API returns a well-formed success response either way. A green write test that
+verifies nothing is worse than no write test.
+
+Assert the response contract exhaustively instead: exact status code, strict schema, echoed
+values matching what was sent, and the assigned id matching the documented rule. Then assert
+the limitation itself - that the resource is *not* retrievable afterwards - so the suite
+turns red if the API ever gains a real backend.
+
 ## Test files
 
 - Every assertion in the suite lives in a spec file.
