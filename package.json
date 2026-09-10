@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit",
     "lint:assertions": "! grep -rEn \"\\bexpect\\b\" src --include=*.ts",
     "report": "playwright show-report",
-    "validate": "npm run typecheck && npm run lint:assertions && npm test"
+    "validate": "npm run typecheck && npm run lint:assertions && npm test",
+    "test:web": "playwright test --project=web"
   }
 }
