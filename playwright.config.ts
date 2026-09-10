@@ -1,6 +1,7 @@
-import { defineConfig } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test'
 
 const API_BASE_URL = process.env.API_BASE_URL ?? 'https://jsonplaceholder.typicode.com'
+const WEB_BASE_URL = process.env.WEB_BASE_URL ?? 'https://www.saucedemo.com'
 
 export default defineConfig({
   testDir: './tests',
@@ -11,12 +12,18 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     trace: 'on-first-retry',
+    testIdAttribute: 'data-test',
   },
   projects: [
     {
       name: 'api',
       testDir: './tests/api',
       use: { baseURL: API_BASE_URL },
+    },
+    {
+      name: 'web',
+      testDir: './tests/web',
+      use: { ...devices['Desktop Chrome'], baseURL: WEB_BASE_URL },
     },
   ],
 })

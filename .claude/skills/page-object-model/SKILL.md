@@ -104,7 +104,15 @@ called. Prefer a locator wherever a locator will do.
 - Methods are named for user intent, not mechanics: `addItemToCart`, not `clickAddButton`.
 - Selectors appear in exactly one place. A raw selector string in a spec file is a bug.
 - Prefer `getByTestId`, `getByRole`, and `getByLabel`. SauceDemo exposes `data-test`
-  attributes throughout, so `getByTestId` is the default here.
+  attributes throughout, so `getByTestId` is the default here. Two caveats, both learned the
+  hard way:
+  - Playwright's `getByTestId` reads `data-testid` by default, not `data-test`. The config
+    sets `testIdAttribute: 'data-test'`; without it every `getByTestId` call silently times
+    out against an element that is plainly in the DOM.
+  - A test id is not always on the element you can click. `data-test="open-menu"` sits on a
+    decorative `<img>` inside the burger button, and clicking it fails with "intercepts
+    pointer events" because the real `<button>` overlays it. When a test id resolves to a
+    non-interactive node, target the interactive element instead and prefer a stable id.
 - One object per page. Anything appearing on several pages - the header, the cart badge,
   the sort dropdown - is a component object under `pages/components/` and is composed in.
 - No `any`. No `page.waitForTimeout()`. Ever.

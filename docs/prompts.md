@@ -426,6 +426,114 @@ across them. Nothing in the toolchain flags it, so it is on review to catch.
 
 ---
 
+## Phase 4 — Web authentication
+
+### P-20 · Authentication is its own suite, weighted toward failure
+
+*2026-09-10*
+
+> as far as authentication: I believe that this should be its own set of tests, and we can
+> really do a ton of work here. The big thing is that we need to make sure we are verifying
+> failure states, too, using the logins that will cause failures.
+
+**What Claude produced:** Drove the real site with a browser before designing anything, and
+came back with a correction to my framing: **only `locked_out_user` actually fails at
+login.** `problem_user`, `performance_glitch_user`, `error_user`, and `visual_user` all
+authenticate successfully and land on `/inventory.html` — their defects are entirely
+post-login. It also captured the exact error strings, and found that the username is
+validated before the password, and that the route guard names the specific path it blocked.
+
+**What I decided:** Split the coverage accordingly — auth owns the locked account plus the
+credential-level failures, and the other four accounts move to `defect-probes`. I had been
+loosely thinking of "the broken users" as a single group that would fail somewhere; they do
+not, and the suite is organised better for knowing where.
+
+This is also where the page object rule paid off concretely. `LoginPage.login()` asserts
+nothing, so one method drives the success case and all six failure cases. Had it verified a
+successful landing, every failure test would need a second method and the negative coverage
+would have been second-class — which is exactly the argument Claude made back in P-06.
+
+---
+
+### P-21 · Where `baseURL` lives
+
+*2026-09-10*
+
+> why aren't we using the baseUrl in the playwright config?
+
+**What Claude produced:** It was there, but per-project rather than top-level, and the
+reason is that the two projects point at different hosts — the `api` project at
+JSONPlaceholder, the `web` project at SauceDemo. Playwright merges top-level `use` with each
+project's, so shared settings (`trace`, `testIdAttribute`) sit up top and the host sits per
+project. Both are env-overridable for pointing at a staging host.
+
+**What I decided:** Kept it. Worth writing down because the same word means two unrelated
+things in this repository: `baseUrl` in `tsconfig.json` (removed in TypeScript 7, see P-08)
+and `baseURL` in the Playwright config. They are unconnected, and I conflated them.
+
+---
+
+### P-22 · Credentials out of the specs
+
+*2026-09-10*
+
+> do you think we should create a file that allows us to keep the users and the passwords
+> out of the tests? I don't know if they will care about this or not, but it seems like an
+> important thing to me. I usually put a ton of that in a file you can get from a secrets
+> vault.
+
+**What Claude produced:** Agreed on the pattern and pushed back on the scale. SauceDemo's
+credentials are printed on its own login page — they are not secrets, and building vault
+integration around public demo values would be padding a reviewer could read as such. What it
+did instead: one module owns credentials, no literals in specs, and the password reads
+`process.env.SAUCE_PASSWORD` with a fallback to the public value. The seam for a real vault
+or CI secret exists; the repository still clones and runs with zero setup.
+
+It also flagged something I did not know: Playwright traces capture `fill()` values, so on a
+real system the password field needs masking in tracing rather than relying on
+`type="password"`.
+
+**What I decided:** Took the middle path. The instinct behind the question is the one I would
+defend in an interview — credentials belong in configuration with an environment seam, and
+that is true whether or not these particular values matter.
+
+---
+
+### P-23 · Enforce the verification cadence
+
+*2026-09-10*
+
+> but let's make sure that we are running tests after creation. I don't do well with large
+> blocks of code, and prefer to verify as we go, please. Can you add that as a skill? I want
+> to try and approve a small piece of code, run the tests and then move on to the next small
+> block. I find it works better for me.
+
+**What Claude produced:** `.claude/skills/incremental-verification/SKILL.md`, and an
+admission that it had just done the thing again — a 120-line auth spec written in one block
+without a single run.
+
+Then the run, which is the part that makes the case. Two of seventeen tests failed, and the
+cause was two layers from the failing line: `data-test="open-menu"` sits on a decorative
+`<img>` inside the burger button, so clicking it fails with "intercepts pointer events"
+because the real `<button>` overlays it.
+
+**What I decided:** This is the second time I have had to give this correction (see P-16),
+which is the point — the assistant did not carry the lesson forward on its own, and my global
+conventions already said to work this way. Stating a preference in prose does not change
+behaviour; the skill file is in the repository so it binds the next session too.
+
+The failure itself was worth having. Finding that selector problem inside one new test is two
+minutes. Finding it inside seventeen new tests, three page objects, a new fixture, and a
+config change means first working out which change is even responsible. Debugging cost does
+not scale with batch size, because the work is isolation, not repair.
+
+It also produced a second correction to a rule I had accepted earlier: "prefer `getByTestId`"
+is not unconditional. Playwright reads `data-testid` by default, so the config needs
+`testIdAttribute: 'data-test'` or every call silently times out — and a test id is not always
+on the element you can actually click. Both caveats went into the page object skill.
+
+---
+
 ## Decisions made through the question/answer tool
 
 Some of my choices were made by picking from options Claude laid out rather than by typing
