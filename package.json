@@ -1,0 +1,24 @@
+{
+  "name": "qa-automation-framework",
+  "version": "0.1.0",
+  "description": "Test automation framework covering the SauceDemo web app and the JSONPlaceholder API",
+  "keywords": [],
+  "author": "Eben Smith <eben.b.smith@gmail.com>",
+  "license": "ISC",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.2",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.1"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "typecheck": "tsc --noEmit",
+    "lint:assertions": "! grep -rEn \"\\bexpect\\b\" src --include=*.ts",
+    "report": "playwright show-report",
+    "validate": "npm run typecheck && npm run lint:assertions && npm test"
+  }
+}
