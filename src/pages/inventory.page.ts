@@ -13,6 +13,7 @@ export class InventoryPage {
   readonly sortDropdown: Locator
   readonly itemNameLabels: Locator
   readonly itemPriceLabels: Locator
+  readonly itemImages: Locator
 
   constructor(private readonly page: Page) {
     this.title = page.getByTestId('title')
@@ -24,6 +25,7 @@ export class InventoryPage {
     this.sortDropdown = page.getByTestId('product-sort-container')
     this.itemNameLabels = page.getByTestId('inventory-item-name')
     this.itemPriceLabels = page.getByTestId('inventory-item-price')
+    this.itemImages = page.locator('.inventory_item_img img')
   }
 
   async goto(path = '/inventory.html'): Promise<void> {
@@ -47,6 +49,10 @@ export class InventoryPage {
   async itemPrices(): Promise<number[]> {
     const labels = await this.itemPriceLabels.allInnerTexts()
     return labels.map((label) => Number(label.replace('$', '')))
+  }
+
+  async itemImageSources(): Promise<string[]> {
+    return this.itemImages.evaluateAll((images) => images.map((image) => image.getAttribute('src') ?? ''))
   }
 
   async sortBy(option: SortOption): Promise<void> {
