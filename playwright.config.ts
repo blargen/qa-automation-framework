@@ -21,9 +21,16 @@ export default defineConfig({
       use: { baseURL: API_BASE_URL },
     },
     {
+      name: 'setup',
+      testDir: './tests/setup',
+      testMatch: /.*\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'], baseURL: WEB_BASE_URL },
+    },
+    {
       name: 'web',
       testDir: './tests/web',
       use: { ...devices['Desktop Chrome'], baseURL: WEB_BASE_URL },
+      dependencies: ['setup'],
     },
   ],
 })
