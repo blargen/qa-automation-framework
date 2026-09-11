@@ -779,6 +779,40 @@ bug that does not exist.
 
 ---
 
+### P-32 · Guard the version-assumption class, not just the instances
+
+*2026-09-11*
+
+> hey, did we actually fix **3. Version assumptions, twice, in the same way.** [...] Both are
+> the same error: generating against a remembered version of a library rather than the one on
+> disk. (P-08, P-09)
+
+**What Claude produced:** A straight no. The two instances were fixed — `baseUrl` is gone and
+`z.strictObject` is used throughout — but the class had no guard, and it was the only one of
+the three recurring problems in this project without one. Page object assertions got
+`lint:assertions`. Verification cadence got a skill. This got a paragraph in a document that
+nothing enforces.
+
+It also tested whether the existing gates already covered it, rather than assuming. They do
+not: `.strict()` and `z.number().int()` still exist in Zod 4 and `tsc --noEmit` reports no
+error on either, so the v3 idiom would have passed every automated check in the repository.
+The typecheck gate caught `baseUrl` only because TypeScript 7 *removed* the option.
+
+**What I decided:** Added `.claude/skills/dependency-verification/SKILL.md`.
+
+I asked because the pattern had become obvious by this point in the project. Three times
+something recurred, and twice the fix was an artifact in the repository rather than a note —
+so the third one sitting in prose stood out. Documenting a failure and preventing it are
+different pieces of work, and the writeup made it look done.
+
+The distinction the check surfaced is the part I would keep: a **removed** API fails loudly
+and the tooling catches it, while a **deprecated but still present** API compiles clean and
+carries no warning. That second case is exactly where a remembered idiom lands, and no gate in
+this repository would ever flag it. Which is why the guard is a practice rather than a script
+— not everything worth enforcing can be.
+
+---
+
 ## Decisions made through the question/answer tool
 
 Some of my choices were made by picking from options Claude laid out rather than by typing
