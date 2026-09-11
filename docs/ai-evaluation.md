@@ -1,3 +1,8 @@
+# Evaluating the AI-assisted build
+
+> **On voice:** written by me, Eben Smith. Throughout `docs/`, *I* and *my* mean the author.
+> The AI assistant is always named.
+
 ## Section 1 — The pattern underneath
 
 ### 1a. Was it worth it — as an accounting, not a verdict
