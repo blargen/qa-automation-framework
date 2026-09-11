@@ -52,8 +52,9 @@ Standing rules that applied to every prompt, whether or not I restated them:
   `test.skip()` was not.
 - **Run the tests before committing.**
 - **Explicit file paths when staging commits**, never `git add .`.
-- **One branch per layer**, small enough to read in a sitting. `zod-schema`, `api-client`,
-  `web-pages`, `defect-probes`, `ci` — each merged to `main` before the next begins.
+- **One branch per layer**, small enough to read in a sitting. In order: `zod-schema`,
+  `api-client-first-pass`, `web-auth`, `qas-be-shopping`, `defect-probes`, `readme` — each
+  merged to `main` before the next began.
 
 ---
 
@@ -129,6 +130,12 @@ beats asserting a count of ten — ten arbitrary users would satisfy a length ch
 | Choice | Reasoning |
 | --- | --- |
 | TypeScript | Type safety at the test-authoring boundary; no `any` is enforceable |
-| Playwright Test | One runner for both targets — the `request` fixture covers the API natively, so web and API share a config, a reporter, and one CI job |
+| Playwright Test | One runner for both targets — the `request` fixture covers the API natively, so web and API share a config, a reporter, and a single command |
 | Zod | Runtime contract validation and static types from a single schema, so the two cannot drift |
-| GitHub Actions | Runs both projects and publishes the HTML report and traces |
+
+**No CI.** I planned a GitHub Actions workflow and dropped it. It is not asked for by the
+brief, and it was my own suggestion that survived into an approved plan unexamined — see
+[P-30](./prompts.md). The deciding factor was that both targets are live third-party sites, so
+a bad day at SauceDemo produces a red badge that says nothing about this framework. The
+validation gates run locally through `npm run validate` and would drop into any CI system
+unchanged.

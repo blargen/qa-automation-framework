@@ -61,8 +61,8 @@ async removeItem(name: string): Promise<void> {
 The second version silently verifies cart arithmetic on behalf of every test that removes
 an item, and no test file says so.
 
-**This is enforced, not merely encouraged:** nothing under `src/` may import `expect`. CI
-greps for it. If a page object seems to need `expect`, it needs `waitFor` instead, or the
+**This is enforced, not merely encouraged:** nothing under `src/` may import `expect`.
+`npm run lint:assertions` greps for it, and `npm run validate` runs that before the suite. If a page object seems to need `expect`, it needs `waitFor` instead, or the
 check belongs in the test.
 
 ## Exposing state

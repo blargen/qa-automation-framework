@@ -30,8 +30,8 @@ things I discovered halfway through. (P-01)
 method which asserts cannot be reused for negative tests (so `login()` verifying success
 forces a second `loginExpectingFailure()`); that waiting and asserting are different and the
 rule erodes at that boundary; and that using `waitFor()` instead of `expect()` inside `src/`
-makes the rule *greppable*, which is what turned a convention into the `lint:assertions` CI
-gate. (P-06)
+makes the rule *greppable*, which is what turned a convention into the `lint:assertions` gate
+in `npm run validate`. (P-06)
 
 **Verifying instead of assuming, once pushed to.** The live-payload checks caught that
 `z.url()` rejects `hildegard.org`, that `geo.lat`/`lng` are strings, and that `POST` returns
@@ -102,7 +102,8 @@ material faster than I can check it. Two things followed from that:
 
 - **Verification cadence has to be enforced by the human.** Nothing in the loop asks whether
   the last six files were ever executed.
-- **Rules belong where they bind.** The no-assertions-in-page-objects rule became a CI grep.
+- **Rules belong where they bind.** The no-assertions-in-page-objects rule became a grep in
+  the validation gate.
   The persistence limitation went into the skill file, not just `api-behavior.md`. Prose
   documentation is advisory; a gate is not.
 
