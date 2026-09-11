@@ -3,6 +3,95 @@
 > **On voice:** written by me, Eben Smith. Throughout `docs/`, *I* and *my* mean the author.
 > The AI assistant is always named.
 
+The record first, then what I make of it. Every incident below is cited to an entry in
+[prompts.md](./prompts.md) and is verifiable from the git history.
+
+---
+
+## What worked
+
+**Framing the exercise.** Handed the brief and an empty repository, Claude pointed out that
+three of the six deliverables are documents, and that the brief ranks technical decisions and
+AI evaluation above test count — so the documentation deserved close to half the budget and
+the prompt log had to be written as work happened. I had been thinking of the writeup as
+something to do at the end. That reframing shaped the whole schedule. (P-01)
+
+**Surfacing the traps in both targets.** Unprompted, it identified the two characteristics
+that punish a naive suite: SauceDemo's deliberately broken accounts, and JSONPlaceholder's
+simulated writes. Both became design constraints rather than things I discovered halfway
+through. (P-01)
+
+**Extending a rule I set rather than just following it.** I gave the page object ground rule —
+actions in pages, assertions in tests. Claude added three things I had not: that a page method
+which asserts cannot be reused for negative tests; that waiting and asserting are different
+and the rule erodes at that boundary; and that banning `expect` inside `src/` makes the rule
+*greppable*, which is what turned a convention into a gate. (P-06)
+
+**Verifying instead of assuming, once pushed to.** The live-payload checks caught that
+`z.url()` rejects `hildegard.org`, that `geo.lat` is a string, and that `POST` returns
+collection size + 1 rather than an allocated id. (P-10, P-15)
+
+**Finding a defect I did not ask it to look for.** Checking raw response text rather than
+parsed numbers turned up the unrounded checkout subtotal on `standard_user` — a bug SauceDemo
+does not advertise, on the account that is supposed to work. (P-24)
+
+**Proposing work I had not asked for, and flagging it as such.** `schema-guards.spec.ts` was
+Claude's idea, and it announced that it went beyond the approved plan rather than adding it
+quietly. (P-13)
+
+---
+
+## What did not work
+
+Ordered by what it would have cost me had I not caught it.
+
+**1. It fabricated my professional experience.** Drafting the prompt log in my voice, it wrote
+that I had "watched this decay on three teams." I never said that. It was invented to make the
+reasoning sound lived-in, in a document I submit under my own name. Caught on review and
+removed. (P-05)
+
+**2. It wrote six files without running any of them — then did it again.** The result type,
+three clients, a fixture and a refactored spec, all generated before a single execution. The
+code happened to pass, which is close to the worst outcome. Two phases later it wrote a
+120-line auth spec in one block, having been corrected once, with my standing conventions
+already saying to work in small verified pieces. **The correction did not carry forward on its
+own** — which is why the fix was a skill committed to the repository rather than another
+instruction. (P-16, P-23)
+
+**3. Version assumptions, twice, in the same way.** It wrote `baseUrl` into `tsconfig.json`,
+which TypeScript 7 removed outright, and would have used Zod v3 idioms had it not checked the
+installed v4 first. Both instances were fixed at the time, but the *class* went unguarded
+until I asked about it directly. The typecheck gate only half covers this: it caught `baseUrl`
+because the option was **removed**, but `.strict()` and `z.number().int()` still exist in Zod 4
+and compile clean. Deprecated-but-present APIs are invisible to tooling. (P-08, P-09, P-32)
+
+**4. Assertions that verified nothing, three times.** `toHaveLength(10)` passes for any ten
+users. Later, the checkout totals tests read both the subtotal and the item prices off the
+same page, so every price on the site could have been wrong and they would still have passed.
+This is the failure mode of generated tests: they look like coverage. Both are now anchored to
+known data, and I had that proven rather than asserted. (P-12, P-31)
+
+**5. Scope that came from the assistant and survived unexamined.** A GitHub Actions workflow
+appeared in the first planning message, went into a plan I approved as a unit, and rode along
+for five phases before I asked where it came from. It is nowhere in the brief. Approving a
+plan is not the same as having checked every line of it. (P-30)
+
+**6. Documentation drifting from reality.** When CI was dropped, the docs still listed GitHub
+Actions in the stack table, named branches that never existed, and called a local npm script a
+"CI gate". The test suite has gates that fail when the code is wrong; prose has nothing
+equivalent, and it drifted exactly where you would predict. (P-31)
+
+**7. Vocabulary drift across files.** The client method was `remove()`, the variable
+`removed`, the test name "a deleted post", the verb `DELETE`. Each file individually
+reasonable, the vocabulary quietly diverging. Nothing in the toolchain flags this. (P-19,
+P-26)
+
+**8. Work I was told would happen and silently was not.** The shopping plan said cancel paths
+would be covered. They were not, and nothing surfaced the gap until I asked for a review.
+(P-31)
+
+---
+
 ## Section 1 — The pattern underneath
 
 ### 1a. Was it worth it — as an accounting, not a verdict
