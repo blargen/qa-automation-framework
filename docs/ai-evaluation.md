@@ -1,6 +1,6 @@
 # Evaluating the AI-assisted build
 
-> **On voice:** written by me, Eben Smith. Throughout `docs/`, *I* and *my* mean the author.
+> **On voice:** written by me, Eben Smith. Throughout `docs/`, _I_ and _my_ mean the author.
 > The AI assistant is always named.
 
 The record first, then what I make of it. Every incident below is cited to an entry in
@@ -25,7 +25,7 @@ through. (P-01)
 actions in pages, assertions in tests. Claude added three things I had not: that a page method
 which asserts cannot be reused for negative tests; that waiting and asserting are different
 and the rule erodes at that boundary; and that banning `expect` inside `src/` makes the rule
-*greppable*, which is what turned a convention into a gate. (P-06)
+_greppable_, which is what turned a convention into a gate. (P-06)
 
 **Verifying instead of assuming, once pushed to.** The live-payload checks caught that
 `z.url()` rejects `hildegard.org`, that `geo.lat` is a string, and that `POST` returns
@@ -60,7 +60,7 @@ instruction. (P-16, P-23)
 
 **3. Version assumptions, twice, in the same way.** It wrote `baseUrl` into `tsconfig.json`,
 which TypeScript 7 removed outright, and would have used Zod v3 idioms had it not checked the
-installed v4 first. Both instances were fixed at the time, but the *class* went unguarded
+installed v4 first. Both instances were fixed at the time, but the _class_ went unguarded
 until I asked about it directly. The typecheck gate only half covers this: it caught `baseUrl`
 because the option was **removed**, but `.strict()` and `z.number().int()` still exist in Zod 4
 and compile clean. Deprecated-but-present APIs are invisible to tooling. (P-08, P-09, P-32)
@@ -96,7 +96,7 @@ would be covered. They were not, and nothing surfaced the gap until I asked for 
 
 ### 1a. Was it worth it — as an accounting, not a verdict
 
-Where did it genuinely save time? (name the artifact, rough hours)
+Where did it genuinely save time?
 
 - Zod schemas — These were ok, but felt like overkill by the end. I think I would use this in something that was long running, but probably avoid it for a one off solution like this.
 - API client scaffolding — This is probably the part that feels the most like magic to me. I can remember agonizing over all of the decisions when originally putting these things together, but the ease with which it creates it takes a great deal of pressure off of the developer. The ability to quickly restructure using AI is something else that makes it a ton easier to work with these things.
@@ -105,15 +105,14 @@ Where did it genuinely save time? (name the artifact, rough hours)
 Where did it cost time you would not otherwise have spent?
 
 - Reviewing six files that had never been run (P-16) — When we get large code blocks like this, it makes it really difficult to make sure that you stay on point. It's the reason many organizations had line limits placed on checkins in the past. I find it better to keep the iteration tight, and to work through one after another. Not only do you see an increase in the quality of the tests, but subsequent tests are often one shots for Claude. This is because it now has a good example of what you are looking for, and you have probably built up some skills/agent/rules to help guide Claude as you run into issues.
-- The 120-line auth spec that failed, cause two layers from the failing line (P-23) —
 - Catching the fabricated "three teams" claim (P-05) — This is the kind of thing that AI gets a horrible name for, and I find that, while it doesn't happen as much as people seem to think, when it does, it is dangerous! The real struggle with working with AI is to not become complacent. We have to remain vigilant so that the last method it creates adheres to the quality and decisions made on the first method. It's the ability to get 9 things right that leads to us missing the tenth. Constant vigilance is the watchword!
 - Version assumptions — tsconfig `baseUrl`, Zod v3 idioms (P-08, P-09) — These were kind of minor, and easy to move past. I think that this is kind of a neutral, as I feel that humans are pretty horrible at this, too. Versioning is a problem with a thousand solutions that no two people seem to agree on.
 - Finding `toHaveLength(10)` asserted nothing (P-12) — This is probably the worst offender of the bunch in many ways. It looks like great testing, but it lacks the specificity that would actually make a test useful. Just ensuring that there are 10 users is ok, but making sure it is the correct 10 users is such a huge step up. This happens less and less as we create rules and skills to help lead Claude, but it stays a challenge. The problem stems from a lack of vigilance, most of the time. We miss it once, and the agent assumes that's an acceptable way to do business.
 
 ### 1b. What changes on a real codebase
 
-- What made verification cheap here? (both targets are fixtures — the truth was one curl
-  away. SauceDemo's bugs are _documented_). This means that I know the failures, and they are intended. In a normal organization, I would be working closely with a developer to highlight issues before they went out to production. We wouldn't ship broken code and write tests around the broken functionality. We would do one of the following in a real organization:
+- What made verification cheap here?
+  - SauceDemo's bugs are _documented_. This means that I know the failures, and they are intended. In a normal organization, I would be working closely with a developer to highlight issues before they went out to production. We wouldn't ship broken code and write tests around the broken functionality. We would do one of the following in a real organization:
   - If the issue was found before the feature was released, we would work closely with the developer to ensure that the correct behavior is actually happening. This would become a roadblock, or at least give us pause, to releasing the feature.
   - If it was found afterwards, we would continue to run the test and let it fail, set it to a test.fail (as we know it will fail), or just comment out the test. Much of this is related to the pain tolerance of failing tests on behalf of the dev team. Failing tests are insidious, in that they erode the organization's trust in the tests. Soon we are shipping code without even running the tests, if we aren't careful. Tests that fail also have a mental rent associated with them: we have to remember that we expected that test to fail.
 - What does not exist on a real system?
