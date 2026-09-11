@@ -59,4 +59,8 @@ export class CheckoutOverviewPage {
   async finish(): Promise<void> {
     await this.finishButton.click()
   }
+
+  async cancel(): Promise<void> {
+    await this.cancelButton.click()
+  }
 }
