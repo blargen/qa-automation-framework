@@ -723,6 +723,62 @@ authority of the document they end up in. Ask where each item came from.
 
 ---
 
+## Phase 8 — Review and fixes
+
+### P-31 · Review everything
+
+*2026-09-10*
+
+> Before we start on that last piece, I would like to see if you could just do a quick review
+> of EVERYTHING we have done. Just check it out and make sure we didn't miss anything
+> important.
+
+> I think 4 and 5 are the worst offenders, though. I figured we probably missed some stuff
+> just from the fact that it's not really my site that I am working on, and there's a ton of
+> work done in a small amount of time.
+
+**What Claude produced:** Six findings, in three groups.
+
+*Documentation claiming things that were not true.* `inputs.md` listed GitHub Actions in the
+stack table and named branches that never existed (`api-client`, `web-pages`, `ci`), and three
+files described `lint:assertions` as a "CI gate". All of it written while CI was still in the
+plan, and none of it swept back when CI was dropped. A reviewer would have read the stack
+table, looked for `.github/`, and found nothing.
+
+*Two coverage gaps.* Nothing exercised `cancel` or `back-to-products` — three buttons modelled
+in the page objects with no test behind them, and I had explicitly said in the shopping plan
+that cancel would be covered. And the checkout totals tests **verified internal consistency
+rather than correctness**: "the subtotal is the sum of the item prices" read *both* numbers off
+the same page, so if every price on the site were wrong it would still pass.
+
+*Minor dead code*, now all consumed by the new tests.
+
+**What I decided:** Fixed all of it. Ranked the two coverage gaps above the documentation
+errors, because a wrong sentence in a document is embarrassing but a test that cannot fail is
+a lie about coverage.
+
+The subtotal test is the one that matters. It is the third time in this project the same
+mistake has appeared — `toHaveLength(10)` in P-12, and the same shape again here — an
+assertion that looks like verification and is really a restatement. The tests now anchor to
+`CATALOGUE_PRICES`, and I had that proven rather than asserted: with one catalogue price
+deliberately corrupted, four of the totals tests fail. Under the old version every one of them
+would have passed.
+
+On the documentation errors, the root cause is worth naming. CI entered the plan in Phase 0,
+got written into the docs as though it existed, and survived being cancelled because nothing
+connects prose to reality. The test suite has gates that fail when the code is wrong; the
+documentation has nothing equivalent, and it drifted exactly where you would predict.
+
+**On the review itself:** it also produced a false alarm. The first cancel probe reported
+`path=/cart.html title="Checkout: Your Information"` and looked like a genuine bug. It was a
+stale DOM read — `data-test="title"` exists on both pages, so waiting for it returned
+instantly against the old content. Re-probing with a wait on an element unique to the
+destination showed correct behaviour. Worth recording because it is the same class of race as
+the `waitForURL` finding in P-23, and because I nearly had a defect report written up for a
+bug that does not exist.
+
+---
+
 ## Decisions made through the question/answer tool
 
 Some of my choices were made by picking from options Claude laid out rather than by typing

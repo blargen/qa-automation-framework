@@ -3,7 +3,7 @@
 Test automation for two targets in one suite: the **SauceDemo** storefront and the
 **JSONPlaceholder** API. TypeScript, Playwright, Zod.
 
-**82 tests · 12 spec files · ~17 seconds · one command**
+**87 tests · 12 spec files · ~17 seconds · one command**
 
 Built for a Senior QA Engineer take-home exercise. It finds real bugs — see
 [Defects found](#defects-found).
@@ -44,7 +44,7 @@ npm run report        # open the HTML report
 | --- | --- | --- |
 | `api` | 27 | Response contracts for posts, comments and users; filtering; 404s; the write endpoints |
 | `setup` | 5 | Signs in once per account and saves the session |
-| `web` | 50 | Login, sorting, cart, checkout, price arithmetic, and 10 defect probes |
+| `web` | 55 | Login, sorting, cart, checkout, price arithmetic, and 10 defect probes |
 
 **Web, in more detail**
 
@@ -53,7 +53,7 @@ npm run report        # open the HTML report
 | Authentication | 17 | Weighted toward failure: 6 credential cases, 3 route-guard paths, session lifecycle |
 | Sorting | 6 | All four orderings, plus "nothing lost or duplicated" |
 | Cart | 9 | Badge counts, contents match selection, removal, persistence across navigation |
-| Checkout | 8 | Full journey, field validation, subtotal/tax/total arithmetic |
+| Checkout | 13 | Full journey, field validation, cancel paths, totals checked against the catalogue |
 | Defect probes | 10 | Real bugs, pinned — see below |
 
 ---

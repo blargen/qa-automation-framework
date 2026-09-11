@@ -33,4 +33,8 @@ export class CheckoutInformationPage {
     await this.postalCodeInput.fill(postalCode)
     await this.continueButton.click()
   }
+
+  async cancel(): Promise<void> {
+    await this.cancelButton.click()
+  }
 }
