@@ -689,6 +689,40 @@ pull requests to tidy a footer would be a worse decision than the one I am corre
 
 ---
 
+## Phase 7 — Front door
+
+### P-30 · Question the CI work, then write the README
+
+*2026-09-10*
+
+> Why are we working on ci stuff? is this something that you decided or something that I am
+> missing in the document for the project?
+
+> let's work on the README next, please. I want it to be thorough, but easy to understand and
+> parse. Readability is paramount here, and we need to get it right!
+
+**What Claude produced:** A straight admission that CI was its own suggestion and appears
+nowhere in the brief — it had proposed it in the first planning message, it went into the plan
+document, and I approved that plan without scrutinising it. It also ranked what remained
+honestly and put its own idea last, and raised a risk it had not mentioned when proposing it:
+CI running against live third-party sites means a bad day at SauceDemo produces a red badge on
+the README, which is worse than no badge.
+
+Then the README, with every number and link verified against the repository rather than
+asserted.
+
+**What I decided:** Dropped CI and wrote the README instead. Worth recording *why* I asked.
+The plan document had four follow-up branches and I approved it as a unit, which meant one
+item that came from the assistant's judgement rather than the brief rode along unexamined for
+five phases. Approving a plan is not the same as having checked every line of it, and a
+generated plan is exactly where an unexamined assumption survives longest — it looks like a
+decision I made, because I said yes to it.
+
+The general lesson, and the one I would take to a team: an assistant's suggestions inherit the
+authority of the document they end up in. Ask where each item came from.
+
+---
+
 ## Decisions made through the question/answer tool
 
 Some of my choices were made by picking from options Claude laid out rather than by typing
